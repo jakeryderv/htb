@@ -1,0 +1,33 @@
+Started with NMAP scanning and found:
+    * port 22 open (ssh)
+    * port 80 open (http)
+
+Went to website and found:
+    * uses Ruby,WEbrick,
+    * then searched for exploits and vulnerabilities related to these technologies
+
+Website had calc form:
+    * tried to inject different types and formats of input to see if anything that isn't excected could get through
+    * we used burpsuite to monitor this and the different requests
+
+Confirmed input valudation vulnerability:
+    * found a format of inputting 7*7 that returned 49, confirming that input validation was the vulnerability (chris could tell you more about this format)
+    * then identified that ruby uses `backticks` to access and use console commands so we then surrounded `ls` with backticks and were able to output the files and directories
+
+reverse shell
+    * used netcat to listen for reverse shell and were able to input reverse shell commands into machine through the input validation vulnerability we found
+    * we then got access to the console on our local machine
+
+finding user flag:
+    * found the hash of the user password in a file
+    * found password format in email dir and ran it through hashcat to crack it
+
+finding root flag:
+    * went to root dir and found root flag
+
+
+
+
+
+
+
