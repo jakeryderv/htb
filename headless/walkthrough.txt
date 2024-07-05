@@ -1,0 +1,14 @@
+
+* NMAP scan results:
+    - 22/tcp  open  ssh  OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
+    - 5000/tcp  open  upnp?
+
+* Dirbuster results:
+    - http://headless.htb:5000/dashboard (CODE:500|SIZE:265)
+    - http://headless.htb:5000/support (CODE:200|SIZE:2363)
+    
+* Web Technologies:
+    - flask 2.2.2
+    - python 3.11.2
+
+ 
